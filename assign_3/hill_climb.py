@@ -25,14 +25,20 @@ def get_possible_moves(state):
     
     return moves
 
-
 def hill_climbing(initial, goal):
     current = initial.copy()
+    step = 0
+    
     while True:
+        print(f"Step {step}:")
+        print(current)
+        heuristic = manhattan_distance(current, goal)
+        print(f"Heuristic: {heuristic}\n")
+        
         neighbors = get_possible_moves(current)
         
         best_move = None
-        best_score = manhattan_distance(current, goal)
+        best_score = heuristic
         
         for neighbor in neighbors:
             score = manhattan_distance(neighbor, goal)
@@ -44,15 +50,24 @@ def hill_climbing(initial, goal):
             break
         
         current = best_move
+        step += 1
     
     return current
 
 def is_goal(state, goal):
     return np.array_equal(state, goal)
 
+def get_user_input(prompt):
+    print(prompt)
+    state = []
+    for _ in range(3):
+        row = list(map(int, input().split()))
+        state.append(row)
+    return np.array(state)
+
 if __name__ == "__main__":
-    initial_state = np.array([[1, 2, 3], [4, 0, 5], [6, 7, 8]])
-    goal_state = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 0]])
+    initial_state = get_user_input("Enter initial state (3x3 grid, space-separated rows):")
+    goal_state = get_user_input("Enter goal state (3x3 grid, space-separated rows):")
     
     print("Initial State:")
     print(initial_state)
