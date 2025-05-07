@@ -1,0 +1,54 @@
+import heapq
+
+GOAL = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+
+def find_zero(puzzle):
+    for i in range(3):
+        for j in range(3):
+            if puzzle[i][j] == 0:
+                return i, j
+
+def get_moves(puzzle):
+    i, j = find_zero(puzzle)
+    moves = []
+    for di, dj in [(-1,0),(1,0),(0,-1),(0,1)]:
+        ni, nj = i+di, j+dj
+        if 0 <= ni < 3 and 0 <= nj < 3:
+            new_puzzle = [row[:] for row in puzzle]
+            new_puzzle[i][j], new_puzzle[ni][nj] = new_puzzle[ni][nj], new_puzzle[i][j]
+            moves.append(new_puzzle)
+    return moves
+
+def heuristic(puzzle):
+    return sum(1 for i in range(3) for j in range(3) if puzzle[i][j] != GOAL[i][j])
+
+def best_first_search(start):
+    heap = [(heuristic(start), start, [])]
+    visited = set()
+    
+    while heap:
+        _, current, path = heapq.heappop(heap)
+        if current == GOAL:
+            return path + [current]
+        
+        visited.add(tuple(map(tuple, current)))
+        
+        for move in get_moves(current):
+            if tuple(map(tuple, move)) not in visited:
+                heapq.heappush(heap, (heuristic(move), move, path + [current]))
+    
+    return None
+
+# Example usage
+if __name__ == "__main__":
+    initial = [[1, 2, 3], [4, 0, 5], [7, 8, 6]]
+    solution = best_first_search(initial)
+    
+    if solution:
+        print("Solution path:")
+        for step in solution:
+            for row in step:
+                print(row)
+            print()
+    else:
+        print("No solution found")

@@ -1,0 +1,23 @@
+import heapq
+
+def astar(graph, start, end):
+    heap = [(0, 0, start, [start])]
+    seen = set()
+    while heap:
+        _, cost, city, path = heapq.heappop(heap)
+        if city == end: return path
+        if city in seen: continue
+        seen.add(city)
+        for neighbor, dist in graph[city].items():
+            heapq.heappush(heap, (cost+dist+abs(ord(neighbor)-ord(end)), cost+dist, neighbor, path+[neighbor]))
+
+graph = {
+    'A': {'B':2, 'C':4},
+    'B': {'A':2, 'D':3},
+    'C': {'A':4, 'D':1},
+    'D': {'B':3, 'C':1, 'E':5},
+    'E': {'D':5}
+}
+if path := astar(graph, 'A', 'E'):
+    print("Path:", '→'.join(path))
+else: print("No path")

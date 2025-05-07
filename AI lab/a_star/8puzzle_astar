@@ -1,0 +1,32 @@
+import heapq
+
+GOAL = ((1,2,3),(4,5,6),(7,8,0))
+
+def moves(puzzle):
+    for i, row in enumerate(puzzle):
+        if 0 in row: x, y = i, row.index(0)
+    for dx, dy in ((-1,0),(1,0),(0,-1),(0,1)):
+        nx, ny = x+dx, y+dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            temp = [list(r) for r in puzzle]
+            temp[x][y], temp[nx][ny] = temp[nx][ny], temp[x][y]
+            yield tuple(tuple(r) for r in temp)
+
+def heuristic(puzzle):
+    return sum(1 for i in range(3) for j in range(3) if puzzle[i][j] != GOAL[i][j])
+
+def solve(start):
+    heap = [(heuristic(start), 0, start, [start])]
+    seen = set()
+    while heap:
+        _, cost, current, path = heapq.heappop(heap)
+        if current == GOAL: return path
+        if current in seen: continue
+        seen.add(current)
+        for move in moves(current):
+            heapq.heappush(heap, (cost+1+heuristic(move), cost+1, move, path+[move]))
+
+start = ((1,2,3),(4,0,5),(7,8,6))
+if path := solve(start):
+    for step in path: print('\n'.join(' '.join(str(x) for x in r) for r in step), '\n')
+else: print("No solution")

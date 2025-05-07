@@ -1,0 +1,47 @@
+# Create empty 4x4 board
+board = [[0,0,0,0],
+         [0,0,0,0],
+         [0,0,0,0],
+         [0,0,0,0]]
+
+def show_board():
+    print("  0 1 2 3")
+    for i in range(4):
+        print(i, end=" ")
+        for j in range(4):
+            print("Q" if board[i][j] else ".", end=" ")
+        print()
+
+def is_safe(row, col):
+    # Check row and column
+    for i in range(4):
+        if board[row][i] == 1 or board[i][col] == 1:
+            return False
+    
+    # Check diagonals
+    for i in range(4):
+        for j in range(4):
+            if (i+j == row+col) or (i-j == row-col):
+                if board[i][j] == 1:
+                    return False
+    return True
+
+# Place 4 queens
+for _ in range(4):
+    show_board()
+    while True:
+        try:
+            r, c = map(int, input("Place queen (row col 0-3): ").split())
+            if 0 <= r < 4 and 0 <= c < 4 and board[r][c] == 0:
+                if is_safe(r, c):
+                    board[r][c] = 1
+                    break
+                else:
+                    print("Queen can be attacked there!")
+            else:
+                print("Invalid position!")
+        except:
+            print("Enter two numbers 0-3 (e.g. '1 2')")
+
+show_board()
+print("Good job!" if sum(sum(row) for row in board) == 4 else "Try again!")

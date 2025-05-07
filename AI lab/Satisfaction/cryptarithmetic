@@ -1,0 +1,23 @@
+from itertools import permutations
+
+def solve_cryptarithmetic():
+    letters = 'SENDMORY'
+    for perm in permutations(range(10), len(letters)):
+        s, e, n, d, m, o, r, y = perm
+        if s == 0 or m == 0:
+            continue
+        send = 1000*s + 100*e + 10*n + d
+        more = 1000*m + 100*o + 10*r + e
+        money = 10000*m + 1000*o + 100*n + 10*e + y
+        if send + more == money:
+            print("  ", send)
+            print("+ ", more)
+            print("------")
+            print(" ", money)
+            print("\nLetter to Digit Mapping:")
+            mapping = dict(zip(letters, perm))
+            for k in sorted(mapping):
+                print(f"  {k} = {mapping[k]}")
+            return
+
+solve_cryptarithmetic()

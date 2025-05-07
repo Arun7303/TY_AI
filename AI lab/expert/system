@@ -1,0 +1,132 @@
+from datetime import datetime, timedelta
+
+class Book:
+    def __init__(self, title, author, genre, copies):
+        self.title = title
+        self.author = author
+        self.genre = genre
+        self.copies = copies
+
+class User:
+    def __init__(self, name, user_type, interest):
+        self.name = name
+        self.user_type = user_type
+        self.interest = interest
+        self.borrowed = []
+
+books = [
+    Book('Harry Potter', 'J.K.Rowling', 'Fantasy', 3),
+    Book('Introduction to AI', 'Stuart Russell', 'Education', 2)
+]
+
+users = [
+    User('Alice', 'Student', 'Fantasy'),
+    User('Librarian', 'Librarian', 'All')
+]
+
+current_user = None
+
+def main():
+    global current_user
+    while True:
+        print("\nLibrary System")
+        if not current_user:
+            print("1. Login\n2. Exit")
+            choice = input("Choose: ")
+            if choice == '1': login()
+            elif choice == '2': break
+        else:
+            if current_user.user_type == 'Librarian':
+                print("1. View Books\n2. Add Book\n3. Add User\n4. Logout")
+                choice = input("Choose: ")
+                if choice == '1': show_books()
+                elif choice == '2': add_book()
+                elif choice == '3': add_user()
+                elif choice == '4': current_user = None
+            else:
+                print(f"1. View Books\n2. Borrow\n3. Return\n4. My Books\n5. Logout")
+                choice = input("Choose: ")
+                if choice == '1': show_books()
+                elif choice == '2': borrow()
+                elif choice == '3': return_book()
+                elif choice == '4': show_borrowed()
+                elif choice == '5': current_user = None
+
+def login():
+    global current_user
+    print("\nUsers:")
+    for i, user in enumerate(users, 1):
+        print(f"{i}. {user.name} ({user.user_type})")
+    try:
+        choice = int(input("Select user: ")) - 1
+        current_user = users[choice]
+    except:
+        print("Invalid choice")
+
+def show_books():
+    print("\nBooks:")
+    for book in books:
+        print(f"{book.title} by {book.author} - {book.copies} left")
+
+def add_book():
+    books.append(Book(
+        input("Title: "),
+        input("Author: "),
+        input("Genre: "),
+        int(input("Copies: "))
+    ))
+    print("Book added!")
+
+def add_user():
+    users.append(User(
+        input("Name: "),
+        input("Type (Student/Faculty/Librarian): "),
+        input("Interest: ")
+    ))
+    print("User added!")
+
+def borrow():
+    show_books()
+    title = input("Book title to borrow: ")
+    for book in books:
+        if book.title.lower() == title.lower():
+            if book.copies > 0:
+                book.copies -= 1
+                due = datetime.now() + timedelta(days=14)
+                current_user.borrowed.append((book.title, due))
+                print(f"Borrowed! Return by {due.date()}")
+                return
+            else:
+                print("No copies available")
+                return
+    print("Book not found")
+
+def return_book():
+    if not current_user.borrowed:
+        print("No books to return")
+        return
+    
+    print("Your books:")
+    for i, (title, due) in enumerate(current_user.borrowed, 1):
+        print(f"{i}. {title} (due {due.date()})")
+    
+    try:
+        choice = int(input("Select book to return: ")) - 1
+        title, _ = current_user.borrowed.pop(choice)
+        for book in books:
+            if book.title == title:
+                book.copies += 1
+        print("Book returned!")
+    except:
+        print("Invalid choice")
+
+def show_borrowed():
+    if not current_user.borrowed:
+        print("No books borrowed")
+    else:
+        print("Your books:")
+        for title, due in current_user.borrowed:
+            print(f"- {title} (due {due.date()})")
+
+if __name__ == "__main__":
+    main()

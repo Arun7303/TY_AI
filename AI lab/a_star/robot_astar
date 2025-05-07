@@ -1,0 +1,24 @@
+import heapq
+
+def astar(grid, start, end):
+    heap = [(0, 0, start, [start])]
+    seen = set()
+    while heap:
+        _, cost, (x,y), path = heapq.heappop(heap)
+        if (x,y) == end: return path
+        if (x,y) in seen: continue
+        seen.add((x,y))
+        for dx, dy in ((-1,0),(1,0),(0,-1),(0,1)):
+            nx, ny = x+dx, y+dy
+            if 0 <= nx < len(grid) and 0 <= ny < len(grid[0]) and not grid[nx][ny]:
+                heapq.heappush(heap, (cost+1+abs(nx-end[0])+abs(ny-end[1]), cost+1, (nx,ny), path+[(nx,ny)]))
+
+grid = [
+    [0,0,0,0],
+    [0,1,1,0],
+    [0,0,0,0],
+    [0,1,0,0]
+]
+if path := astar(grid, (0,0), (3,3)):
+    print("Path:", *path)
+else: print("No path")

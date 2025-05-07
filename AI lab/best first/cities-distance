@@ -1,0 +1,37 @@
+import heapq
+
+def best_first_search(graph, start, goal):
+    heap = [(0, start, [])]
+    visited = set()
+    
+    while heap:
+        cost, city, path = heapq.heappop(heap)
+        if city == goal:
+            return path + [city]
+        
+        visited.add(city)
+        
+        for neighbor, dist in graph[city].items():
+            if neighbor not in visited:
+                heapq.heappush(heap, (dist, neighbor, path + [city]))
+    
+    return None
+
+# Example usage
+if __name__ == "__main__":
+    city_graph = {
+        'A': {'B': 2, 'C': 4},
+        'B': {'A': 2, 'D': 3},
+        'C': {'A': 4, 'D': 1},
+        'D': {'B': 3, 'C': 1, 'E': 5},
+        'E': {'D': 5}
+    }
+    
+    start = 'A'
+    goal = 'E'
+    
+    path = best_first_search(city_graph, start, goal)
+    if path:
+        print("Shortest path:", ' -> '.join(path))
+    else:
+        print("No path found")

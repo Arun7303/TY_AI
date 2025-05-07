@@ -1,0 +1,83 @@
+import random
+import math
+
+# Goal state
+GOAL = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+
+def find_zero(puzzle):
+    """Find the position of the empty tile (0)"""
+    for i in range(3):
+        for j in range(3):
+            if puzzle[i][j] == 0:
+                return i, j
+
+def get_neighbors(puzzle):
+    """Generate all possible next states"""
+    i, j = find_zero(puzzle)
+    neighbors = []
+    
+    # Possible moves: up, down, left, right
+    for di, dj in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+        ni, nj = i + di, j + dj
+        if 0 <= ni < 3 and 0 <= nj < 3:
+            new_puzzle = [row[:] for row in puzzle]
+            new_puzzle[i][j], new_puzzle[ni][nj] = new_puzzle[ni][nj], new_puzzle[i][j]
+            neighbors.append(new_puzzle)
+    
+    return neighbors
+
+def h(puzzle):
+    """Heuristic function: number of misplaced tiles"""
+    count = 0
+    for i in range(3):
+        for j in range(3):
+            if puzzle[i][j] != GOAL[i][j]:
+                count += 1
+    return count
+
+def hill_climbing(puzzle, max_iter=1000):
+    """Hill Climbing algorithm for 8-puzzle"""
+    current = puzzle
+    current_h = h(current)
+    
+    for _ in range(max_iter):
+        if current_h == 0:
+            return current  # Solution found
+        
+        neighbors = get_neighbors(current)
+        if not neighbors:
+            break  # No more moves
+        
+        # Find the best neighbor
+        best_neighbor = min(neighbors, key=h)
+        best_h = h(best_neighbor)
+        
+        if best_h >= current_h:
+            break  # Local minimum reached
+        
+        current = best_neighbor
+        current_h = best_h
+    
+    return None  # No solution found
+
+def print_puzzle(puzzle):
+    """Print the puzzle state"""
+    for row in puzzle:
+        print(" ".join(map(str, row)))
+    print()
+
+# Example usage
+if __name__ == "__main__":
+    # Initial state (0 represents the empty tile)
+    initial = [[1, 2, 3], [4, 0, 6], [7, 5, 8]]
+    
+    print("Initial state:")
+    print_puzzle(initial)
+    
+    solution = hill_climbing(initial)
+    
+    if solution:
+        print("Solution found:")
+        print_puzzle(solution)
+    else:
+        print("No solution found (may be stuck in local minimum)")

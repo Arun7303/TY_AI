@@ -1,0 +1,30 @@
+def solve_map_coloring():
+    regions = ['A', 'B', 'C', 'D']
+    neighbors = {
+        'A': ['B', 'C'],
+        'B': ['A', 'C', 'D'],
+        'C': ['A', 'B', 'D'],
+        'D': ['B', 'C']
+    }
+    colors = ['Red', 'Green', 'Blue']
+    
+    def is_valid(assignment, region, color):
+        return all(assignment.get(n) != color for n in neighbors[region])
+    
+    def backtrack(assignment):
+        if len(assignment) == len(regions):
+            return assignment
+        region = [r for r in regions if r not in assignment][0]
+        for color in colors:
+            if is_valid(assignment, region, color):
+                assignment[region] = color
+                result = backtrack(assignment)
+                if result:
+                    return result
+                del assignment[region]
+        return None
+    
+    solution = backtrack({})
+    print("Map Coloring:", solution)
+
+solve_map_coloring()
